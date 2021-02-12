@@ -50,8 +50,4 @@ public class UserServiceImplTest {
         User newUser = userDao.save(user);
         assertEquals(user.getUsername(), newUser.getUsername());
     }
-
-
-
-
 }

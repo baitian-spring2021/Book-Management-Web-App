@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 import java.util.HashMap;
 
 @Component
-public class RequestBodyValidator {
+public class UserRequestBodyValidator {
 
     @Autowired
     private UserService userService;
