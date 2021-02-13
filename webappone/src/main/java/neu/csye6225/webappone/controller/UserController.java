@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import neu.csye6225.webappone.pojo.User;
 import neu.csye6225.webappone.service.UserService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
-import neu.csye6225.webappone.utils.validation.RequestBodyValidator;
+import neu.csye6225.webappone.utils.validation.UserRequestBodyValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +27,7 @@ public class UserController {
     @Autowired
     private UserAuthorization userAuthorization;
     @Autowired
-    private RequestBodyValidator requestBodyValidator;
+    private UserRequestBodyValidator userRequestBodyValidator;
 
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
@@ -79,7 +79,7 @@ public class UserController {
 
         // check request body validity
         HashMap<String, String> reqBodyCheckResult =
-                requestBodyValidator.checkForPut(newUserInfo, registeredUser.getUsername());
+                userRequestBodyValidator.checkForPut(newUserInfo, registeredUser.getUsername());
         if (reqBodyCheckResult.containsKey("error")) { // return http 400 if request body is invalid
             return new ResponseEntity<>(reqBodyCheckResult, HttpStatus.BAD_REQUEST);
         }
@@ -115,7 +115,7 @@ public class UserController {
         HashMap<String, String> mapUser = new ObjectMapper().readValue(jsonUser, new TypeReference<>(){});
 
         // check request body validity
-        HashMap<String, String> reqBodyCheckResult = requestBodyValidator.checkForPost(mapUser);
+        HashMap<String, String> reqBodyCheckResult = userRequestBodyValidator.checkForPost(mapUser);
         if (reqBodyCheckResult.containsKey("error")) { // return http 400 if request body is invalid
             return new ResponseEntity<>(reqBodyCheckResult, HttpStatus.BAD_REQUEST);
         }

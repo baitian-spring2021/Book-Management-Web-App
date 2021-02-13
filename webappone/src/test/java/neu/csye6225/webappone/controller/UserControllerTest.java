@@ -1,15 +1,12 @@
 package neu.csye6225.webappone.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import neu.csye6225.webappone.pojo.User;
 import neu.csye6225.webappone.service.UserService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
-import neu.csye6225.webappone.utils.validation.RequestBodyValidator;
+import neu.csye6225.webappone.utils.validation.UserRequestBodyValidator;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -39,7 +36,7 @@ public class UserControllerTest {
     @MockBean
     private UserAuthorization userAuthorization;
     @MockBean
-    private RequestBodyValidator requestBodyValidator;
+    private UserRequestBodyValidator userRequestBodyValidator;
 
     private User user = new User("Jane", "Doe", "janeDoe@example.com", "12345aA!");
     HashMap<String, String> authRes = new HashMap<>();
@@ -48,14 +45,14 @@ public class UserControllerTest {
 
 
     @Before
-    public void setup() throws JsonProcessingException {
+    public void setup() {
         authRes.put("username", user.getUsername());
         authRes.put("status", "200");
         given(userAuthorization.check(null)).willReturn(authRes);
         given(userService.findByUsernameIgnoreCase(user.getUsername())).willReturn(user);
-        given(requestBodyValidator.checkForPut(reqBodyRes, user.getUsername())).willReturn(reqBodyRes);
-        given(requestBodyValidator.checkForPut(reqBodyRes, user.getUsername())).willReturn(reqBodyRes);
-        given(requestBodyValidator.checkForPost(emptyMap)).willReturn(reqBodyRes);
+        given(userRequestBodyValidator.checkForPut(reqBodyRes, user.getUsername())).willReturn(reqBodyRes);
+        given(userRequestBodyValidator.checkForPut(reqBodyRes, user.getUsername())).willReturn(reqBodyRes);
+        given(userRequestBodyValidator.checkForPost(emptyMap)).willReturn(reqBodyRes);
     }
 
     @Test
