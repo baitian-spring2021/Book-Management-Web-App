@@ -1,5 +1,7 @@
 package neu.csye6225.webappone.utils.validation;
 
+import neu.csye6225.webappone.service.BookService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.Arrays;
@@ -10,6 +12,9 @@ import java.util.UUID;
 @Component
 public class BookRequestBodyValidator {
 
+    @Autowired
+    private BookService bookService;
+
     public HashMap<String, String> checkForPost(HashMap<String, String> bookInput) {
         HashMap<String, String> response = new HashMap<String, String>();
         HashSet<String> month = new HashSet<String>(Arrays
@@ -17,19 +22,6 @@ public class BookRequestBodyValidator {
                         "aug", "sep", "oct", "nov", "dec", "january", "february",
                         "march", "april", "june", "july", "august", "september",
                         "october", "november", "december"));
-
-        if (!bookInput.containsKey("id") || bookInput.get("id").isBlank()) {
-        // check if id (book) is not null
-            response.put("error", "Please do not leave the book 'id' empty!");
-        } else if (bookInput.containsKey("id")) {
-            try {
-                // check if the inputted id is in UUID format
-                UUID validId = UUID.fromString(bookInput.get("id"));
-            } catch (IllegalArgumentException exception) {
-                response.put("error", "Please enter a valid 'id' in UUID format!");
-                return response;
-            }
-        }
 
         if (!bookInput.containsKey("title") || bookInput.get("title").isBlank()) {
         // check if title is not null, not empty and not blank
@@ -40,6 +32,9 @@ public class BookRequestBodyValidator {
         } else if (!bookInput.containsKey("isbn") || !bookInput.get("isbn").matches("\\d{3}+-\\d{10}+")) {
         // check if isbn is a not null and follows a correct ISBN 13 format
             response.put("error", "Please enter a valid 'isbn' in the format of XXX-XXXXXXXXXX.");
+        } else if (bookService.findByIsbn(bookInput.get("isbn")) != null) {
+        // check if isbn is unique
+            response.put("error", "There is already a book with isbn " + bookInput.get("isbn"));
         } else if (!bookInput.containsKey("published_date") || bookInput.get("published_date").isBlank()) {
         // check if the published date is not null
             response.put("error", "Please do not leave the 'published_date' empty!");

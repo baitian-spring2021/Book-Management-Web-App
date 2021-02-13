@@ -10,6 +10,7 @@ import java.util.List;
 public interface BookDao extends JpaRepository<Book, Long> {
     Book save(Book book);
     Book findById(String id);
+    Book findByIsbn(String isbn);
     List<Book> findAll();
     void deleteById(String id);
 }

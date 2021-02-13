@@ -38,7 +38,7 @@ public class BookServiceImplTest {
     @MockBean
     private BookDao bookDao;
 
-    private Book book = new Book("d6193106-a192-46db-aae9-f151004ee453","Computer Networks",
+    private Book book = new Book("Computer Networks",
             "Andrew S. Tanenbaum", "978-0132126953", "May, 2020");
     List<Book> allBooks = new ArrayList();
 

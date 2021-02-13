@@ -20,6 +20,8 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Book {
     @Id
+    @Column(columnDefinition = "CHAR(36)", updatable = false, nullable = false)
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String id;
     private String title;
     private String author;
@@ -34,8 +36,8 @@ public class Book {
     private String user_id; // readOnly
 
     @JsonCreator
-    public Book(String id, String title, String author, String isbn, String published_date) {
-        this.id = id;
+    public Book(String title, String author, String isbn, String published_date) {
+        this.id = UUID.randomUUID().toString();
         this.title = title;
         this.author = author;
         this.isbn = isbn;
