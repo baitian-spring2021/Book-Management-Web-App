@@ -7,6 +7,7 @@ import neu.csye6225.webappone.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +18,7 @@ import java.util.HashMap;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -24,16 +26,20 @@ public class BookRequestBodyValidatorTest {
     @Autowired
     private BookRequestBodyValidator bookRequestBodyValidator;
 
-    private Book book = new Book("d6193106-a192-46db-aae9-f151004ee453","Computer Networks",
+    @MockBean
+    private BookService bookService;
+
+    private Book book = new Book("Computer Networks",
             "Andrew S. Tanenbaum", "978-0132126953", "May, 2020");
+
+    @Before
+    public void setup() {
+        when(bookService.findByIsbn(book.getIsbn())).thenReturn(null);
+    }
+
     @Test
     public void checkForPostTest() {
         HashMap<String, String> bookInput = new HashMap<>();
-        // invalid id
-        bookInput.put("id", "asdf");
-        assertEquals(bookRequestBodyValidator.checkForPost(bookInput).get("error"),
-                "Please enter a valid 'id' in UUID format!");
-        bookInput.put("id", book.getId());
         // invalid title
         assertEquals(bookRequestBodyValidator.checkForPost(bookInput).get("error"),
                 "Please do not leave the book 'title' empty!");
@@ -51,7 +57,7 @@ public class BookRequestBodyValidatorTest {
         // invalid password
         bookInput.put("published_date", "may, 202");
         assertEquals(bookRequestBodyValidator.checkForPost(bookInput).get("error"),
-                "Please enter 'published_date' in the format of MMM-YYYY, month in characters only.");
+                "Please enter 'published_date' in the format of 'MMM, YYYY', month in characters only.");
         bookInput.put("published_date", book.getPublished_date());
         // successful post
         assertTrue(bookRequestBodyValidator.checkForPost(bookInput).containsKey("ok"));

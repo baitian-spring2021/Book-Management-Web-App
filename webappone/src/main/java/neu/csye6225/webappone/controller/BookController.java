@@ -62,10 +62,13 @@ public class BookController {
 
         // check for book id validity
         Book book = bookService.findById(id);
+        HashMap<String, String> errMsg = new HashMap<>();
         if (book == null) {
-            HashMap<String, String> errMsg = new HashMap<>();
             errMsg.put("error", "There is no book found with id " + id);
             return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
+        } else if (!book.getUser_id().equals(authResult.get("id"))) {
+            errMsg.put("error", "This book does not belong to you.");
+            return new ResponseEntity<>(errMsg, HttpStatus.UNAUTHORIZED);
         } else {
             return new ResponseEntity<>(book.serializeToMap(), HttpStatus.OK);
         }
@@ -87,10 +90,13 @@ public class BookController {
 
         // check for book id validity
         Book book = bookService.findById(id);
+        HashMap<String, String> errMsg = new HashMap<>();
         if (book == null) {
-            HashMap<String, String> errMsg = new HashMap<>();
             errMsg.put("error", "There is no book found with id " + id);
             return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
+        } else if (!book.getUser_id().equals(authResult.get("id"))) {
+            errMsg.put("error", "This book does not belong to you.");
+            return new ResponseEntity<>(errMsg, HttpStatus.UNAUTHORIZED);
         } else {
             bookService.deleteById(id);
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
@@ -107,7 +113,7 @@ public class BookController {
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
-        if (!authResult.get("status").equals("200")) { // if auth is invalid
+        if (!authResult.get("status").equals("200")) {
             return noAuthResponse(authResult);
         }
 
@@ -119,10 +125,8 @@ public class BookController {
             return new ResponseEntity<>(reqBodyCheckResult, HttpStatus.BAD_REQUEST);
         }
 
-        // todo: unique id/isbn
-
         // create new book
-        Book tmpBook = new Book(mapBook.get("id"), mapBook.get("title"), mapBook.get("author"),
+        Book tmpBook = new Book(mapBook.get("title"), mapBook.get("author"),
                 mapBook.get("isbn"), mapBook.get("published_date"));
         tmpBook.setUser_id(authResult.get("id"));
         String currTimestamp = formatter.format(new Date());
@@ -138,12 +142,14 @@ public class BookController {
      * This method process the API response if authorization is invalid.
      */
     private ResponseEntity<?> noAuthResponse(HashMap<String, String> authRes) {
-        if (authRes.get("status").equals("400")) { // return http 400 if authentication format is invalid
-            authRes.remove("status");
-            return new ResponseEntity<>(authRes,HttpStatus.BAD_REQUEST);
-        } else { // return http 401 if username or password is invalid
+        if (authRes.get("status").equals("401")) {
+        // return http 401 if username or password is invalid
             authRes.remove("status");
             return new ResponseEntity<>(authRes,HttpStatus.UNAUTHORIZED);
+        } else {
+        // return http 400 if authentication format is invalid
+            authRes.remove("status");
+            return new ResponseEntity<>(authRes,HttpStatus.BAD_REQUEST);
         }
     }
 
