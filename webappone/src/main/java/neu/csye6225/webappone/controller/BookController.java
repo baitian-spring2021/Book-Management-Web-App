@@ -32,7 +32,7 @@ public class BookController {
     @Autowired
     private BookRequestBodyValidator bookRequestBodyValidator;
 
-    private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.000'Z'");
+    private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
     /**
      * This method handles the GET call to /books which gets all books' information.
@@ -60,10 +60,11 @@ public class BookController {
             return noAuthResponse(authResult);
         }
 
+        // check for book id validity
         Book book = bookService.findById(id);
-        HashMap<String, String> errMsg = new HashMap<>();
-        errMsg.put("error", "There is no book found with id " + id);
         if (book == null) {
+            HashMap<String, String> errMsg = new HashMap<>();
+            errMsg.put("error", "There is no book found with id " + id);
             return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
         } else {
             return new ResponseEntity<>(book.serializeToMap(), HttpStatus.OK);
@@ -84,10 +85,11 @@ public class BookController {
             return noAuthResponse(authResult);
         }
 
+        // check for book id validity
         Book book = bookService.findById(id);
-        HashMap<String, String> errMsg = new HashMap<>();
-        errMsg.put("error", "There is no book found with id " + id);
         if (book == null) {
+            HashMap<String, String> errMsg = new HashMap<>();
+            errMsg.put("error", "There is no book found with id " + id);
             return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
         } else {
             bookService.deleteById(id);
@@ -111,7 +113,6 @@ public class BookController {
 
         // new user information as hashmap
         HashMap<String, String> mapBook = new ObjectMapper().readValue(jsonBook, new TypeReference<>(){});
-
         // check request body validity
         HashMap<String, String> reqBodyCheckResult = bookRequestBodyValidator.checkForPost(mapBook);
         if (reqBodyCheckResult.containsKey("error")) { // return http 400 if request body is invalid
