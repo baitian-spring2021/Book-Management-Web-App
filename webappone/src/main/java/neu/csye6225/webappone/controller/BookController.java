@@ -52,23 +52,13 @@ public class BookController {
      * This method handles the GET call to /books/{id} which use book id to get book information.
      */
     @GetMapping(value = "/{id}", produces = "application/json")
-    public @ResponseBody ResponseEntity<?> getBookById(HttpServletRequest request, @PathVariable String id) {
-        // check for authorization
-        String header = request.getHeader("Authorization");
-        HashMap<String, String> authResult = userAuthorization.check(header);
-        if (!authResult.get("status").equals("200")) { // if auth is invalid
-            return noAuthResponse(authResult);
-        }
-
+    public @ResponseBody ResponseEntity<?> getBookById(@PathVariable String id) {
         // check for book id validity
         Book book = bookService.findById(id);
         HashMap<String, String> errMsg = new HashMap<>();
         if (book == null) {
             errMsg.put("error", "There is no book found with id " + id);
             return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
-        } else if (!book.getUser_id().equals(authResult.get("id"))) {
-            errMsg.put("error", "This book does not belong to you.");
-            return new ResponseEntity<>(errMsg, HttpStatus.UNAUTHORIZED);
         } else {
             return new ResponseEntity<>(book.serializeToMap(), HttpStatus.OK);
         }
