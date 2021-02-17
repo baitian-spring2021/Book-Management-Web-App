@@ -65,7 +65,7 @@ public class BookControllerTest {
     }
 
     @Test
-    public void getBookById_inValid() throws Exception {
+    public void getBookById_valid() throws Exception {
         this.mvc.perform(MockMvcRequestBuilders.get("/books/" + book.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
@@ -79,7 +79,7 @@ public class BookControllerTest {
     }
 
     @Test
-    public void deleteBookById_inValid() throws Exception {
+    public void deleteBookById_valid() throws Exception {
         this.mvc.perform(MockMvcRequestBuilders
                 .delete("/books/" + book.getId())
                 .contentType(MediaType.APPLICATION_JSON))
