@@ -1,4 +1,4 @@
-# WebApp_2
+# WebApp
 
 This is a basic web app with user creation, user information update and get user information([API docs](https://app.swaggerhub.com/apis-docs/csye6225/spring2021/assignment-02)).
 
@@ -21,7 +21,7 @@ This is a basic web app with user creation, user information update and get user
 > * Maven
 
 1. Clone this repository to your local machine.
-2. <code>$ cd webapp/webappone</code>
+2. <code>$ cd webappone</code>
 3. <code>$ mvn clean install</code> to build the project.
 4. <code>$ java -jar target/webappone-0.0.1-SNAPSHOT.jar</code> to execute the application.
 
