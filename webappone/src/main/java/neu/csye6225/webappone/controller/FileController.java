@@ -49,8 +49,8 @@ public class FileController {
     @PostMapping(value = "/{bookId}/image", produces = "application/json")
     public @ResponseBody
     ResponseEntity<?> uploadImage(
-            @PathVariable("bookId") String bookId, @RequestParam(value = "file", required = false) MultipartFile file,
-            HttpServletRequest request, Principal principal) throws JsonProcessingException {
+            @PathVariable("bookId") String bookId, @RequestParam(value = "file") MultipartFile file,
+            HttpServletRequest request){
         HashMap<String, String> errMsg = new HashMap<>();
 
         // check for authorization
@@ -75,7 +75,7 @@ public class FileController {
         File tmpFile = new File(fileCheckResult.get("fileName"), authResult.get("id"), bookId,
                 formatter.format(new Date()), book);
 
-        // todo: save image to s3
+        // upload image to s3
         HashMap<String, String> s3UploadResult = s3FileService.uploadFile(tmpFile.getS3_object_name(), file);
         if (!s3UploadResult.containsKey("ok")) {
             return new ResponseEntity<>(s3UploadResult, HttpStatus.BAD_REQUEST);
@@ -109,20 +109,23 @@ public class FileController {
         if (book == null) {
             errMsg.put("error", "There is no book found with id " + bookId);
             return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
-        } else if (!book.getUser_id().equals(authResult.get("id"))) { // not the image author
-            errMsg.put("error", "This image is not uploaded by you.");
-            return new ResponseEntity<>(errMsg, HttpStatus.UNAUTHORIZED);
         } else {
+            // check image in the database
+            File uploadedFile = fileService.findByFileId(imgId);
+            if (uploadedFile == null) {
+                errMsg.put("error", "This image does not exist.");
+                return new ResponseEntity<>(errMsg, HttpStatus.NOT_FOUND);
+            } else if (!uploadedFile.getUser_id().equals(authResult.get("id"))) { // attempt not from original user
+                errMsg.put("error", "This image is not uploaded by you.");
+                return new ResponseEntity<>(errMsg, HttpStatus.UNAUTHORIZED);
+            }
             // delete image from s3
             HashMap<String, String> s3DeleteResult = s3FileService.deleteFile(bookId + "/" + imgId);
             if (!s3DeleteResult.containsKey("ok")) {
                 return new ResponseEntity<>(s3DeleteResult, HttpStatus.BAD_REQUEST);
             }
-            // delete image meta data
+            // delete image meta data from rds
             fileService.deleteByFileId(imgId);
-            // todo: check parent book_images
-            // book.removeImage(imgId);
-            // bookService.save(book);
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         }
     }

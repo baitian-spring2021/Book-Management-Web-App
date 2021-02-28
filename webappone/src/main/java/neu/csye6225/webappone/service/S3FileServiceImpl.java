@@ -19,9 +19,13 @@ public class S3FileServiceImpl implements  S3FileService {
 
     @Autowired
     private AmazonS3 s3client;
-    @Value("${AWS_BUCKET_NAME}")
+    @Value("${s3.bucketName}")
     private String bucketName;
 
+    /**
+     * Delete image inside S3 bucket.
+     * @return
+     */
     @Override
     public HashMap<String, String> deleteFile(String s3_object_name) {
         HashMap<String, String> deleteRes = new HashMap<>();
@@ -40,16 +44,15 @@ public class S3FileServiceImpl implements  S3FileService {
         return deleteRes;
     }
 
+    /**
+     * Upload image to s3 bucket.
+     */
     @Override
     public HashMap<String, String> uploadFile(String s3_object_name, MultipartFile uploadedFile) {
         HashMap<String, String> uploadRes = new HashMap<>();
         File file = null;
         try {
             file = multipartToFile(uploadedFile);
-//            PutObjectRequest putObjectRequest = new PutObjectRequest(bucketName, primaryKey, file);
-//            AccessControlList acl = new AccessControlList();
-//            acl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
-//            putObjectRequest.setAccessControlList(acl);
             s3client.putObject(bucketName, s3_object_name, file);
             uploadRes.put("ok","");
         } catch (AmazonServiceException ase) {

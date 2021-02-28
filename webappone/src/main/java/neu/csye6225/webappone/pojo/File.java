@@ -1,5 +1,6 @@
 package neu.csye6225.webappone.pojo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,7 +28,7 @@ public class File {
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String user_id;
     @ManyToOne
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @JsonIgnore
     private Book book;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private String created_date;
