@@ -14,10 +14,9 @@ public class S3Application {
 
     @Bean
     public AmazonS3 s3client() {
-
+        //.withCredentials(new InstanceProfileCredentialsProvider(false))
         AmazonS3 amazonS3Client = AmazonS3ClientBuilder.standard()
                 .withRegion(region)
-                .withCredentials(new InstanceProfileCredentialsProvider(false))
                 .build();
         return amazonS3Client;
     }
