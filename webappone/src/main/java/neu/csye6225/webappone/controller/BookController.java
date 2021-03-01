@@ -5,17 +5,23 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import neu.csye6225.webappone.pojo.Book;
+import neu.csye6225.webappone.pojo.File;
 import neu.csye6225.webappone.service.BookService;
+import neu.csye6225.webappone.service.FileService;
+import neu.csye6225.webappone.service.S3FileService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
 import neu.csye6225.webappone.utils.validation.BookRequestBodyValidator;
+import neu.csye6225.webappone.utils.validation.FileValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
+import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,6 +33,8 @@ import java.util.List;
 public class BookController {
     @Autowired
     private BookService bookService;
+    @Autowired
+    private S3FileService s3FileService;
     @Autowired
     private UserAuthorization userAuthorization;
     @Autowired
@@ -88,6 +96,13 @@ public class BookController {
             errMsg.put("error", "This book does not belong to you.");
             return new ResponseEntity<>(errMsg, HttpStatus.UNAUTHORIZED);
         } else {
+            for (File f : book.getBook_images()) {
+                HashMap<String, String> s3ImgDeleteResult = s3FileService.deleteFile(f.getS3_object_name());
+                if (!s3ImgDeleteResult.containsKey("ok")) {
+                    return new ResponseEntity<>(s3ImgDeleteResult, HttpStatus.BAD_REQUEST);
+                }
+            }
+            // todo: check fileService images
             bookService.deleteById(id);
             return new ResponseEntity<>(null, HttpStatus.NO_CONTENT);
         }
@@ -98,7 +113,7 @@ public class BookController {
      * It checks for authorization and user's request body format.
      */
     @PostMapping(produces = "application/json", consumes = "application/json")
-    public @ResponseBody ResponseEntity<?> registerUser(HttpServletRequest request,
+    public @ResponseBody ResponseEntity<?> createBook(HttpServletRequest request,
                                                         @RequestBody String jsonBook) throws JsonProcessingException {
         // check for authorization
         String header = request.getHeader("Authorization");
@@ -124,9 +139,11 @@ public class BookController {
 
         // save the book and return response http 201
         bookService.save(tmpBook);
-        HashMap<String, String> response = tmpBook.serializeToMap();
+        HashMap<String, Object> response = tmpBook.serializeToMap();
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
+
+
 
     /**
      * This method process the API response if authorization is invalid.
