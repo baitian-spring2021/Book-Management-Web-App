@@ -1,14 +1,10 @@
 package neu.csye6225.webappone.utils.validation;
 
 import neu.csye6225.webappone.pojo.Book;
-import neu.csye6225.webappone.pojo.User;
 import neu.csye6225.webappone.service.BookService;
-import neu.csye6225.webappone.service.UserService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes={BookRequestBodyValidator.class})
 public class BookRequestBodyValidatorTest {
     @Autowired
     private BookRequestBodyValidator bookRequestBodyValidator;
