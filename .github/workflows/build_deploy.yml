@@ -1,4 +1,6 @@
 name: Build and Deploy Webapp
+env:
+  ARTIFACT_NAME: webapp-${{github.event.pull_request.id}}.zip
 
 on:
   pull_request:
