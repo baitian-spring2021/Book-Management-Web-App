@@ -1,0 +1,69 @@
+name: Deploy Webapp
+
+env:
+  ARTIFACT_NAME: webapp-${{github.event.pull_request.id}}.zip 
+
+on:
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build_ami:
+
+    # runner
+    runs-on: ubuntu-latest
+
+    steps:
+
+      # Install Packages
+      - name: Install apt & zip
+        run: sudo apt-get update && sudo apt-get install wget zip unzip -y
+
+      # Install AWS CLI
+      - name: Install AWS CLI
+        run: |
+          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+          unzip awscliv2.zip
+          sudo ./aws/install
+
+      # AWS Credentials
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_KEY }}
+          aws-region: us-east-1
+
+      # Zip Artifact
+      - name: Zip Artifact
+        run: |
+          mkdir -p codedeploy_artifact
+          zip -r ${{ env.ARTIFACT_NAME }} \
+          ./webappone/target/webappone-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
+          mv ${{ env.ARTIFACT_NAME }} codedeploy_artifact/
+
+      # Upload Artifacts to S3
+      - name: Upload Artifacts
+        run: |
+          aws s3 csync ./codedeploy_artifact s3://${{ secrets.S3_BUCKET_NAME }}
+
+
+      # Deploy Artifact to EC2
+      - name: Deploy Webapp
+        run: |
+          output=$(aws deploy create-deployment \
+          --application-name "csye6225-webapp" \
+          --deployment-config-name CodeDeployDefault.AllAtOnce \
+          --deployment-group-name "csye6225-webapp-deployment" \
+          --description "deploy webapp" \
+          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=${{ env.ARTIFACT_NAME }} \
+          --region us-east-1 \
+          --output json)
+
+          echo $output
+
+          dId=$(echo $output | jq -r '.deploymentId')
+
+          aws deploy wait deployment-successful --deployment-id $dId
