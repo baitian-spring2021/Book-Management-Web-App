@@ -10,3 +10,5 @@
 # sudo rm -rf /var/lib/tomcat9/logs/catalina*
 # sudo rm -rf /var/lib/tomcat9/logs/*.log
 # sudo rm -rf /var/lib/tomcat9/logs/*.txt
+
+sudo kill -9 `sudo lsof -t -i:8080`
