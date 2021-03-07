@@ -1,6 +1,6 @@
 name: Build and Deploy Webapp
 env:
-  ARTIFACT_NAME: webapp-${{github.event.pull_request.id}}.zip
+  ARTIFACT_NAME: webapp-${{ sha_short }}.zip
 
 on:
   pull_request:
@@ -25,6 +25,11 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11.0.4
+
+      # Set up sha_short variable
+      - name: Set sha_short
+        id: vars
+        run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
       # Run Tests
       - name: Run all Tests
@@ -69,7 +74,7 @@ jobs:
       # Upload Artifacts to S3
       - name: Upload Artifacts
         run: |
-          aws s3 csync ./codedeploy_artifact s3://${{ secrets.S3_BUCKET_NAME }}
+          aws s3 sync ./codedeploy_artifact s3://${{ secrets.S3_BUCKET_NAME }}
 
 
       # Deploy Artifact to EC2
