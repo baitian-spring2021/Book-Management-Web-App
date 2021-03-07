@@ -61,8 +61,8 @@ jobs:
         run: |
           mkdir -p codedeploy_artifact
           zip -r ${{ env.ARTIFACT_NAME }} \
-          ./webappone/target/webappone-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
-          mv ${{ env.ARTIFACT_NAME }} codedeploy_artifact/
+          ./webappone/target/webappone-0.0.1-SNAPSHOT.jar ./codedeploy/*.sh appspec.yml
+          mv ${{ env.ARTIFACT_NAME }} ./codedeploy_artifact/
 
       # Upload Artifacts to S3
       - name: Upload Artifacts
