@@ -29,7 +29,6 @@ jobs:
         run: |
           cd webappone
           mvn test
-          cd ..
 
       # Build
       - name: Build Artifact
