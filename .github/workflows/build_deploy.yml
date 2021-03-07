@@ -1,6 +1,4 @@
 name: Build and Deploy Webapp
-env:
-  ARTIFACT_NAME: webapp-${{ sha_short }}.zip
 
 on:
   pull_request:
@@ -67,9 +65,9 @@ jobs:
       - name: Zip Artifact
         run: |
           mkdir codedeploy_artifact
-          zip -r ${{ env.ARTIFACT_NAME }} \
+          zip -r webapp-${{ steps.vars.outputs.sha_short }}.zip \
           ./webappone/target/webappone-0.0.1-SNAPSHOT.jar ./codedeploy/*.sh appspec.yml
-          mv ${{ env.ARTIFACT_NAME }} ./codedeploy_artifact
+          mv webapp-${{ steps.vars.outputs.sha_short }}.zip ./codedeploy_artifact
 
       # Upload Artifacts to S3
       - name: Upload Artifacts
@@ -85,7 +83,7 @@ jobs:
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --deployment-group-name "csye6225-webapp-deployment" \
           --description "deploy webapp" \
-          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=${{ env.ARTIFACT_NAME }} \
+          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=webapp-${{ steps.vars.outputs.sha_short }}.zip \
           --region us-east-1 \
           --output json)
 
