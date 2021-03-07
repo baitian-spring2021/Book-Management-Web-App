@@ -1,5 +1,8 @@
 name: Deploy Webapp
 
+env:
+  ARTIFACT_NAME: webapp-${{github.event.pull_request.id}}.zip 
+
 on:
   pull_request:
     branches: [ main ]
@@ -37,22 +40,30 @@ jobs:
       - name: Zip Artifact
         run: |
           mkdir -p codedeploy_artifact
-          zip -r webapp-${{github.event.pull_request.id}}.zip \
+          zip -r ${{ env.ARTIFACT_NAME }} \
           ./webappone/target/webappone-0.0.1-SNAPSHOT.jar codedeploy/*.sh appspec.yml
-          mv webapp-${{github.event.pull_request.id}}.zip codedeploy_artifact/
+          mv ${{ env.ARTIFACT_NAME }} codedeploy_artifact/
 
       # Upload Artifacts to S3
       - name: Upload Artifacts
         run: |
-          aws s3 cp ./codedeploy_artifact/webapp-${{github.event.pull_request.id}}.zip s3://${{ secrets.S3_BUCKET_NAME }}
+          aws s3 csync ./codedeploy_artifact s3://${{ secrets.S3_BUCKET_NAME }}
 
 
       # Deploy Artifact to EC2
       - name: Deploy Webapp
         run: |
-          aws deploy create-deployment \
+          output=$(aws deploy create-deployment \
           --application-name "csye6225-webapp" \
           --deployment-config-name CodeDeployDefault.AllAtOnce \
           --deployment-group-name "csye6225-webapp-deployment" \
-          --description "deployed webapp" \
-          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=webapp-${{github.event.pull_request.id}}.zip
+          --description "deploy webapp" \
+          --s3-location bucket=${{ secrets.S3_BUCKET_NAME }},bundleType=zip,key=${{ env.ARTIFACT_NAME }} \
+          --region us-east-1 \
+          --output json)
+
+          echo $output
+
+          dId=$(echo $output | jq -r '.deploymentId')
+
+          aws deploy wait deployment-successful --deployment-id $dId
