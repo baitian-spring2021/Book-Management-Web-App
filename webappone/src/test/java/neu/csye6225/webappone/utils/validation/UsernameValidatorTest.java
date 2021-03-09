@@ -1,6 +1,5 @@
 package neu.csye6225.webappone.utils.validation;
 
-import org.apache.commons.validator.routines.EmailValidator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +13,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest
+@SpringBootTest(classes = {UsernameValidator.class})
 public class UsernameValidatorTest {
 
     @Autowired
