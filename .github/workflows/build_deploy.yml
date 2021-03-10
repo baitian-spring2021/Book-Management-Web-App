@@ -29,13 +29,6 @@ jobs:
         id: vars
         run: echo "::set-output name=sha_short::$(git rev-parse --short HEAD)"
 
-      # Run Tests
-      - name: Run all Tests
-        run: |
-          cd webappone
-          mvn test
-          cd ..
-
       # Build
       - name: Build Artifact
         run: |
