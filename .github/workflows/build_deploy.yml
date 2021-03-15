@@ -39,7 +39,7 @@ jobs:
       - name: Install apt & zip
         run: sudo apt-get update && sudo apt-get install wget zip unzip -y
 
-      # AWS CLI is pre-installed in Ubuntu-Latest
+      # AWS CLI pre-installed in Ubuntu-Latest
 
       # AWS Credentials
       - name: Configure AWS credentials
