@@ -44,7 +44,7 @@ jobs:
         run: |
           curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
           unzip awscliv2.zip
-          sudo ./aws/install
+          if [ ! -d "/usr/local/aws-cli/v2/current" ] then sudo ./aws/install fi
 
       # AWS Credentials
       - name: Configure AWS credentials
