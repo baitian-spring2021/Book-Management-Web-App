@@ -29,7 +29,7 @@ import java.util.List;
 
 @Controller
 @RestController
-@RequestMapping("/mybooks")
+@RequestMapping("/books")
 public class BookController {
     @Autowired
     private BookService bookService;
