@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import neu.csye6225.webappone.pojo.Book;
 import neu.csye6225.webappone.pojo.User;
 import neu.csye6225.webappone.service.BookService;
+import neu.csye6225.webappone.service.S3FileService;
 import neu.csye6225.webappone.service.UserService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
 import neu.csye6225.webappone.utils.validation.BookRequestBodyValidator;
@@ -29,15 +30,17 @@ import java.util.List;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-//@RunWith(SpringRunner.class)
-//@WebMvcTest(BookController.class)
-//@AutoConfigureMockMvc
+@RunWith(SpringRunner.class)
+@WebMvcTest(BookController.class)
+@AutoConfigureMockMvc
 public class BookControllerTest {
     @Autowired
     private MockMvc mvc;
 
     @MockBean
     private BookService bookService;
+    @MockBean
+    private S3FileService s3FileService;
     @MockBean
     private UserAuthorization userAuthorization;
     @MockBean
@@ -64,21 +67,21 @@ public class BookControllerTest {
         given(bookRequestBodyValidator.checkForPost(emptyMap)).willReturn(reqBodyRes);
     }
 
-    //@Test
+    @Test
     public void getBookById_valid() throws Exception {
         this.mvc.perform(MockMvcRequestBuilders.get("/books/" + book.getId())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
-    //@Test
+    @Test
     public void getAllBooks_valid() throws Exception {
         this.mvc.perform(MockMvcRequestBuilders.get("/books")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
-    //@Test
+    @Test
     public void deleteBookById_valid() throws Exception {
         this.mvc.perform(MockMvcRequestBuilders
                 .delete("/books/" + book.getId())
@@ -86,7 +89,7 @@ public class BookControllerTest {
                 .andExpect(status().isNoContent());
     }
 
-    //@Test
+    @Test
     public void createBook_valid() throws Exception {
         MockHttpServletRequestBuilder mockHttpReq = MockMvcRequestBuilders
                 .post("/books")
