@@ -3,6 +3,7 @@ package neu.csye6225.webappone.controller;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.timgroup.statsd.StatsDClient;
 import neu.csye6225.webappone.pojo.User;
 import neu.csye6225.webappone.service.UserService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
@@ -28,6 +29,8 @@ public class UserController {
     private UserAuthorization userAuthorization;
     @Autowired
     private UserRequestBodyValidator userRequestBodyValidator;
+    @Autowired
+    private StatsDClient statsd;
 
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
@@ -37,11 +40,14 @@ public class UserController {
      */
     @GetMapping(value = "/v1/user/self", produces = "application/json")
     public @ResponseBody ResponseEntity<?> getUserInfo(HttpServletRequest request) {
+        long startTime = System.currentTimeMillis();
+        statsd.increment("Calls - Get User");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
 
         // return request reponse
+        statsd.recordExecutionTime("Api Response Time - Get User",System.currentTimeMillis() - startTime);
         if (authResult.get("status").equals("400")) { // return http 400 if authentication format is invalid
             authResult.remove("status");
             return new ResponseEntity<>(authResult,HttpStatus.BAD_REQUEST);
@@ -61,14 +67,18 @@ public class UserController {
     @PutMapping(value = "/v1/user/self", produces = "application/json", consumes = "application/json")
     public @ResponseBody ResponseEntity<?> updateUser(HttpServletRequest request, @RequestBody String jsonUser)
             throws JsonProcessingException {
+        long startTime = System.currentTimeMillis();
+        statsd.increment("Calls - Put User");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
         if (authResult.get("status").equals("400")) { // return http 400 if authentication format is invalid
             authResult.remove("status");
+            statsd.recordExecutionTime("Api Response Time - Put User",System.currentTimeMillis() - startTime);
             return new ResponseEntity<>(authResult,HttpStatus.BAD_REQUEST);
         } else if (authResult.get("status").equals("401")) { // return http 401 if username or password is invalid
             authResult.remove("status");
+            statsd.recordExecutionTime("Api Response Time - Put User",System.currentTimeMillis() - startTime);
             return new ResponseEntity<>(authResult,HttpStatus.UNAUTHORIZED);
         }
 
@@ -81,6 +91,7 @@ public class UserController {
         HashMap<String, String> reqBodyCheckResult =
                 userRequestBodyValidator.checkForPut(newUserInfo, registeredUser.getUsername());
         if (reqBodyCheckResult.containsKey("error")) { // return http 400 if request body is invalid
+            statsd.recordExecutionTime("Api Response Time - Put User",System.currentTimeMillis() - startTime);
             return new ResponseEntity<>(reqBodyCheckResult, HttpStatus.BAD_REQUEST);
         }
 
@@ -100,6 +111,7 @@ public class UserController {
         String currTimestamp = formatter.format(new Date());
         registeredUser.setAccount_updated(currTimestamp);
         userService.save(registeredUser);
+        statsd.recordExecutionTime("Api Response Time - Put User",System.currentTimeMillis() - startTime);
         HashMap<String, String> response = new HashMap<>(); // response
         response.put("message", "You have successfully updated your information!");
         return new ResponseEntity<>(response, HttpStatus.NO_CONTENT);
@@ -111,12 +123,15 @@ public class UserController {
      */
     @PostMapping(value = "/v1/user", produces = "application/json", consumes = "application/json")
     public @ResponseBody ResponseEntity<?> registerUser(@RequestBody String jsonUser) throws JsonProcessingException {
+        long startTime = System.currentTimeMillis();
+        statsd.increment("Calls - Post User");
         // converts inputted user information from JSON to HashMap
         HashMap<String, String> mapUser = new ObjectMapper().readValue(jsonUser, new TypeReference<>(){});
 
         // check request body validity
         HashMap<String, String> reqBodyCheckResult = userRequestBodyValidator.checkForPost(mapUser);
         if (reqBodyCheckResult.containsKey("error")) { // return http 400 if request body is invalid
+            statsd.recordExecutionTime("Api Response Time - Post User",System.currentTimeMillis() - startTime);
             return new ResponseEntity<>(reqBodyCheckResult, HttpStatus.BAD_REQUEST);
         }
 
@@ -131,6 +146,7 @@ public class UserController {
         // register the user and return response http 201
         userService.save(tmpUser);
         HashMap<String, String> response = tmpUser.serializeToMap();
+        statsd.recordExecutionTime("Api Response Time - Post User",System.currentTimeMillis() - startTime);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
