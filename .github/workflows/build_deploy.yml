@@ -3,7 +3,7 @@ name: Build and Deploy Webapp
 
 on:
   push:
-    branches: [ assignment_6 ]
+    branches: [ main ]
 
   workflow_dispatch:
 
