@@ -5,25 +5,22 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.timgroup.statsd.StatsDClient;
-import neu.csye6225.webappone.metrics.StatsDMetrics;
 import neu.csye6225.webappone.pojo.Book;
 import neu.csye6225.webappone.pojo.File;
 import neu.csye6225.webappone.service.BookService;
-import neu.csye6225.webappone.service.FileService;
 import neu.csye6225.webappone.service.S3FileService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
 import neu.csye6225.webappone.utils.validation.BookRequestBodyValidator;
-import neu.csye6225.webappone.utils.validation.FileValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -44,6 +41,7 @@ public class BookController {
     @Autowired
     private StatsDClient statsd;
 
+    private Logger logger = LoggerFactory.getLogger(BookController.class);
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
     /**
@@ -53,6 +51,7 @@ public class BookController {
     public @ResponseBody ResponseEntity<?> getAllBooks() {
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Get All Books");
+        logger.info("Calling Get All Books");
         List<Book> allBooks = bookService.findAll();
         statsd.recordExecutionTime("Api Response Time - Get All Books",System.currentTimeMillis() - startTime);
         if (allBooks.isEmpty()) {
@@ -71,6 +70,7 @@ public class BookController {
     public @ResponseBody ResponseEntity<?> getBookById(@PathVariable String id) {
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Get Book By Id");
+        logger.info("Calling Get Book By Id");
         // check for book id validity
         Book book = bookService.findById(id);
         HashMap<String, String> errMsg = new HashMap<>();
@@ -92,6 +92,7 @@ public class BookController {
     public ResponseEntity<?> deleteBookById(HttpServletRequest request, @PathVariable String id) throws Exception{
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Delete Book By Id");
+        logger.info("Calling Delete Book");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
@@ -130,6 +131,7 @@ public class BookController {
                                                         @RequestBody String jsonBook) throws JsonProcessingException {
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Post Book");
+        logger.info("Calling Post Book");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);

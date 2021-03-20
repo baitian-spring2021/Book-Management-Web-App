@@ -1,6 +1,5 @@
 package neu.csye6225.webappone.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.timgroup.statsd.StatsDClient;
 import neu.csye6225.webappone.pojo.Book;
 import neu.csye6225.webappone.pojo.File;
@@ -8,8 +7,9 @@ import neu.csye6225.webappone.service.BookService;
 import neu.csye6225.webappone.service.FileService;
 import neu.csye6225.webappone.service.S3FileService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
-import neu.csye6225.webappone.utils.validation.BookRequestBodyValidator;
 import neu.csye6225.webappone.utils.validation.FileValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
-import java.security.Principal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -42,6 +41,7 @@ public class FileController {
     @Autowired
     private StatsDClient statsd;
 
+    private Logger logger = LoggerFactory.getLogger(FileController.class);
     private final SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
 
@@ -56,6 +56,7 @@ public class FileController {
             HttpServletRequest request){
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Post File");
+        logger.info("Calling Post File");
         HashMap<String, String> errMsg = new HashMap<>();
 
         // check for authorization
@@ -108,6 +109,7 @@ public class FileController {
                                              @PathVariable String imgId) {
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Delete File");
+        logger.info("Calling Delete File");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);

@@ -8,6 +8,8 @@ import neu.csye6225.webappone.pojo.User;
 import neu.csye6225.webappone.service.UserService;
 import neu.csye6225.webappone.utils.auth.UserAuthorization;
 import neu.csye6225.webappone.utils.validation.UserRequestBodyValidator;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +34,7 @@ public class UserController {
     @Autowired
     private StatsDClient statsd;
 
+    private Logger logger = LoggerFactory.getLogger(UserController.class);
     private SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.000'Z'");
 
     /**
@@ -42,6 +45,7 @@ public class UserController {
     public @ResponseBody ResponseEntity<?> getUserInfo(HttpServletRequest request) {
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Get User");
+        logger.info("Cing Get User");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
@@ -69,6 +73,7 @@ public class UserController {
             throws JsonProcessingException {
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Put User");
+        logger.info("Calling Put User");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
@@ -125,6 +130,7 @@ public class UserController {
     public @ResponseBody ResponseEntity<?> registerUser(@RequestBody String jsonUser) throws JsonProcessingException {
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Post User");
+        logger.info("Calling Post User");
         // converts inputted user information from JSON to HashMap
         HashMap<String, String> mapUser = new ObjectMapper().readValue(jsonUser, new TypeReference<>(){});
 
