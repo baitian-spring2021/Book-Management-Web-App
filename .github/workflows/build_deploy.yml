@@ -1,5 +1,6 @@
 name: Build and Deploy Webapp
 
+
 on:
   push:
     branches: [ main ]
@@ -54,7 +55,7 @@ jobs:
         run: |
           mkdir codedeploy_artifact
           zip -r webapp-${{ steps.vars.outputs.sha_short }}.zip \
-          ./webappone/target/webappone-0.0.1-SNAPSHOT.jar ./codedeploy/*.sh appspec.yml
+          ./webappone/target/webappone-0.0.1-SNAPSHOT.jar ./codedeploy/*.sh appspec.yml cloudwatch_config.json
           mv webapp-${{ steps.vars.outputs.sha_short }}.zip ./codedeploy_artifact
 
       # Upload Artifacts to S3

@@ -1,5 +1,6 @@
 package neu.csye6225.webappone.service;
 
+import com.timgroup.statsd.StatsDClient;
 import neu.csye6225.webappone.dao.UserDao;
 import neu.csye6225.webappone.pojo.User;
 import org.junit.Before;
@@ -29,6 +30,8 @@ public class UserServiceImplTest {
 
     @MockBean
     private UserDao userDao;
+    @MockBean
+    private StatsDClient statsd;
 
     private User user = new User("Jane", "Doe", "janeDoe@example.com", "12345aA!");
 
