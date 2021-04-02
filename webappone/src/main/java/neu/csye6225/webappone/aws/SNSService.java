@@ -24,13 +24,13 @@ public class SNSService {
         InstanceProfileCredentialsProvider provider = new InstanceProfileCredentialsProvider(true);
         this.snsClient =  AmazonSNSClientBuilder.standard().withCredentials(provider).withRegion(Regions.US_EAST_1).build();
 
-        Map<String, String> topicAttributes = new HashMap<String, String>();
-        topicAttributes.put("FifoTopic", "true");
-        topicAttributes.put("ContentBasedDeduplication", "true");
+        //Map<String, String> topicAttributes = new HashMap<>();
+        //topicAttributes.put("FifoTopic", "true");
+        //topicAttributes.put("ContentBasedDeduplication", "true");
         CreateTopicResult topic = snsClient.createTopic(
                 new CreateTopicRequest()
-                        .withName("Notification_Email")
-                        .withAttributes(topicAttributes));
+                        .withName("Notification_Email"));
+                        //.withAttributes(topicAttributes));
         topicArn = topic.getTopicArn();
     }
 
