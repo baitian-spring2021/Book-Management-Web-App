@@ -37,7 +37,8 @@ public class SNSService {
     public void postToTopic(String requestType, String recipientEmail, String bookId, String bookName, String author){
         try {
             PublishRequest publishReq = new PublishRequest(topicArn,
-                    requestType + "|" + recipientEmail + "|" + bookId  + "|" + bookName + "|" + author);
+                    requestType + "|" + recipientEmail + "|" + bookId  + "|" + bookName + "|" + author +  "|" +
+                    "http://prod.tianyubai.me/books/" + bookId);
             PublishResult result = snsClient.publish(publishReq);
             logger.info("Message "+ result.getMessageId() + " is successfully published to SNS Topic 'EMAIL'.");
         } catch (AmazonSNSException e) {
