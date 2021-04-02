@@ -29,7 +29,7 @@ public class SNSService {
         topicAttributes.put("ContentBasedDeduplication", "true");
         CreateTopicResult topic = snsClient.createTopic(
                 new CreateTopicRequest()
-                        .withName("EMAIL")
+                        .withName("Notification_Email")
                         .withAttributes(topicAttributes));
         topicArn = topic.getTopicArn();
     }
@@ -40,7 +40,7 @@ public class SNSService {
                     requestType + "|" + recipientEmail + "|" + bookId  + "|" + bookName + "|" + author +  "|" +
                     "http://prod.tianyubai.me/books/" + bookId);
             PublishResult result = snsClient.publish(publishReq);
-            logger.info("Message "+ result.getMessageId() + " is successfully published to SNS Topic 'EMAIL'.");
+            logger.info("Message "+ result.getMessageId() + " is successfully published to SNS Topic 'Notification_Email'.");
         } catch (AmazonSNSException e) {
             logger.error("SNS Exception Warning - " + e.getMessage());
         }
