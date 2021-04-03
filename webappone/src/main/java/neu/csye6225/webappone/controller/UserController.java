@@ -45,7 +45,7 @@ public class UserController {
     public @ResponseBody ResponseEntity<?> getUserInfo(HttpServletRequest request) {
         long startTime = System.currentTimeMillis();
         statsd.increment("Calls - Get User");
-        logger.info("Cing Get User");
+        logger.info("Calling Get User");
         // check for authorization
         String header = request.getHeader("Authorization");
         HashMap<String, String> authResult = userAuthorization.check(header);
