@@ -1,6 +1,7 @@
 package neu.csye6225.webappone.aws;
 
 import com.amazonaws.auth.InstanceProfileCredentialsProvider;
+import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.sns.AmazonSNS;
 import com.amazonaws.services.sns.AmazonSNSClientBuilder;
@@ -15,14 +16,13 @@ import java.util.Map;
 
 @Service
 public class SNSService {
-    private final AmazonSNS snsClient;
+    private AmazonSNS snsClient;
     private final static Logger logger = LoggerFactory.getLogger(SNSService.class);
     String topicArn;
 
     @Autowired
     public SNSService(){
-        InstanceProfileCredentialsProvider provider = new InstanceProfileCredentialsProvider(true);
-        this.snsClient =  AmazonSNSClientBuilder.standard().withCredentials(provider).withRegion(Regions.US_EAST_1).build();
+        this.snsClient =  AmazonSNSClientBuilder.defaultClient();
 
         //Map<String, String> topicAttributes = new HashMap<>();
         //topicAttributes.put("FifoTopic", "true");
