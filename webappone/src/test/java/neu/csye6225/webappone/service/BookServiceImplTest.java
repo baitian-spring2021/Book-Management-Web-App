@@ -49,17 +49,17 @@ public class BookServiceImplTest {
 
     private Book book = new Book("Computer Networks",
             "Andrew S. Tanenbaum", "978-0132126953", "May, 2020");
+    private User user = new User("first", "last", "email", "password");
     List<Book> allBooks = new ArrayList();
 
     @Before
     public void setUp() {
-        book.setUser_id("id");
+        book.setUser_id(user.getId());
         allBooks.add(book);
         Mockito.when(bookDao.findById(book.getId())).thenReturn(book);
         Mockito.when(bookDao.save(book)).thenReturn(book);
         Mockito.when(bookDao.findAll()).thenReturn(allBooks);
-        Mockito.when(userDao.findById("id"))
-                .thenReturn(new User("first", "last", "email", "password"));
+        Mockito.when(userDao.findById(book.getUser_id())).thenReturn(user);
     }
 
     @Test
@@ -79,5 +79,10 @@ public class BookServiceImplTest {
     public void findAllTest() {
         List<Book> allFoundBooks = bookService.findAll();
         assertEquals(allFoundBooks.size(), allBooks.size());
+    }
+
+    @Test
+    public void deleteTest() {
+        bookService.deleteById(book.getId());
     }
 }
