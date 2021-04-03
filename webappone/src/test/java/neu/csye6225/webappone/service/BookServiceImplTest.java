@@ -53,10 +53,13 @@ public class BookServiceImplTest {
 
     @Before
     public void setUp() {
+        book.setUser_id("id");
         allBooks.add(book);
         Mockito.when(bookDao.findById(book.getId())).thenReturn(book);
         Mockito.when(bookDao.save(book)).thenReturn(book);
         Mockito.when(bookDao.findAll()).thenReturn(allBooks);
+        Mockito.when(userDao.findById("id"))
+                .thenReturn(new User("first", "last", "email", "password"));
     }
 
     @Test
@@ -66,7 +69,7 @@ public class BookServiceImplTest {
         assertThat(found.getAuthor()).isEqualTo(author);
     }
 
-    //@Test
+    @Test
     public void saveTest() {
         Book newBook = bookService.save(book);
         assertEquals(book.getAuthor(), newBook.getAuthor());
