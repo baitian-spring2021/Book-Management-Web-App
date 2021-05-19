@@ -1,6 +1,6 @@
 # WebApp
 
-This is a basic web app with user creation, user information update and get user information([API docs](https://app.swaggerhub.com/apis-docs/csye6225/spring2021/assignment-02)).
+This is a basic web app with user creation, user information update and get user information([API docs](https://app.swaggerhub.com/apis-docs/csye6225/spring2021)).
 
 ### Tech Stack
 
