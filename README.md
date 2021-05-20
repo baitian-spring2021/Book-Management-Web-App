@@ -1,6 +1,9 @@
 # WebApp
 
-This is a basic web app with user creation, user information update and get user information([API docs](https://app.swaggerhub.com/apis-docs/csye6225/spring2021)).
+This is a book management web application with user authentication([API docs](https://app.swaggerhub.com/apis-docs/csye6225/spring2021)). All infrastructure codes are included in this organization. 
+
+### Backend Architecture
+![Architecture Design](https://github.com/baitian-spring2021/webapp/blob/main/Cloud%20Architecture.jpeg)
 
 ### Tech Stack
 
